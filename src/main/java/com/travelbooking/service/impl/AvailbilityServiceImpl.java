@@ -50,7 +50,7 @@ public class AvailbilityServiceImpl implements AvailabilityService {
                 bookingRepository.findByResourceAndJourneyDate(resource, date);
 
         boolean booked = bookings.stream()
-                .anyMatch(b -> b.getStatus() == BookingStatus.CONFIRMED);
+                .anyMatch(b -> b.getStatus() == BookingStatus.CONFIRMED|| b.getStatus() == BookingStatus.INITIATED);
 
         if (booked) return false;
 

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 
 
 
-public class UserRequestDTO {
+public class RegisterRequestDTO {
 
     @NotBlank(message = "Name is required")
     private String username;
@@ -18,8 +18,6 @@ public class UserRequestDTO {
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotNull(message = "Role is required")
-    private Role role;
 
     public String getUsername() {
         return username;
@@ -29,9 +27,6 @@ public class UserRequestDTO {
     }
     public String getPassword() {
         return password;
-    }
-    public Role getRole() {
-        return role;
     }
 
 }

@@ -4,19 +4,23 @@ import java.time.LocalDateTime;
 
 public class BookingRequestDTO{
 
-    private Long userId;
+    private String transportCode;
     private Long resourceId;
     private LocalDateTime journeyDate;
+    private Long UserId;
     private BigDecimal amount;
 
     public Long getUserId() {
-        return userId;
+        return UserId;
     }
     public Long getResourceId() {
         return resourceId;
     }
     public LocalDateTime getJourneyDate() {
         return journeyDate;
+    }
+    public String getTransportCode() {
+        return transportCode;
     }
     public BigDecimal getAmount() {
         return amount;

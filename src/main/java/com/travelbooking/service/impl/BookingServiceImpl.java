@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService {
                 .isAvailable(resource, bookingRequest.getJourneyDate());
 
         if (!available) {
-            throw new BusinessException("No seats available");
+            throw new BusinessException("Seat is already booked or Locked by another user");
         }
 
         // 2️⃣ Create booking (INITIATED)
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.getBookingId()
         );
 
-        return mapToResponseDTO(booking);
+        return new BookingResponseDTO(booking.getBookingId(), booking.getResource().getTransport().getTransportCode(), booking.getResource().getSection(), booking.getResource().getResourceNumber(), booking.getJourneyDate(), booking.getStatus());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
 
         seatLockService.releaseSeats(booking.getResource().getResourceId(), booking.getJourneyDate());
 
-        return mapToResponseDTO(booking);
+        return new BookingResponseDTO(booking.getBookingId(), booking.getResource().getTransport().getTransportCode(), booking.getResource().getSection(), booking.getResource().getResourceNumber(), booking.getJourneyDate(), booking.getStatus());
     }
 
     @Override
@@ -99,18 +99,8 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
 
         seatLockService.releaseSeats(booking.getResource().getResourceId(), booking.getJourneyDate());
-        return mapToResponseDTO(booking);
+        return new BookingResponseDTO(booking.getBookingId(), booking.getResource().getTransport().getTransportCode(), booking.getResource().getSection(), booking.getResource().getResourceNumber(), booking.getJourneyDate(), booking.getStatus());
     }
 
-    private BookingResponseDTO mapToResponseDTO(Booking booking) {
-        return new BookingResponseDTO(
-                booking.getBookingId(),
-                booking.getUser().getUserId(),
-                booking.getResource().getResourceId(),
-                booking.getJourneyDate(),
-                booking.getAmount(),
-                booking.getStatus().name(),
-                booking.getCreatedAt()
-        );
-    }
+    
 }

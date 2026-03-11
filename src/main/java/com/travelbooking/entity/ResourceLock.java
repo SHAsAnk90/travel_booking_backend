@@ -3,6 +3,9 @@ package com.travelbooking.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "resource_lock",uniqueConstraints = {@UniqueConstraint(columnNames = {"resource_id", "journey_date"})})
 public class ResourceLock {
@@ -26,7 +29,8 @@ public class ResourceLock {
     private LocalDateTime lockExpiryTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status",columnDefinition = "lock_status_enum", nullable = false)
     private LockStatus status;
 
     @Column(name = "created_at")
