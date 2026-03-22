@@ -3,6 +3,7 @@ import com.travelbooking.dto.request.ResourceRequestDTO;
 import com.travelbooking.dto.response.ResourceResponseDTO;
 import com.travelbooking.service.ResourceService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,7 +17,7 @@ public class ResourceController {
     {
         this.resourceService = resourceService;
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ResourceResponseDTO> createResource(@RequestBody ResourceRequestDTO request)
     {

@@ -1,14 +1,16 @@
 package com.travelbooking.service.impl;
-
 import com.travelbooking.dto.request.BookingRequestDTO;
 import com.travelbooking.dto.response.BookingResponseDTO;
 import com.travelbooking.entity.*;
 import com.travelbooking.exception.BusinessException;
 import com.travelbooking.exception.ResourceNotFoundException;
 import com.travelbooking.repository.*;
+import com.travelbooking.security.CustomUserDetails;
 import com.travelbooking.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -18,6 +20,7 @@ public class BookingServiceImpl implements BookingService {
     private final SeatLockService seatLockService;
     private final AvailabilityService availabilityService;
     private final UserRepository userRepository;
+
 
     public BookingServiceImpl(BookingRepository bookingRepository,
                               ResourceRepository resourceRepository,
@@ -31,6 +34,14 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
     @Override
     @Transactional
     public BookingResponseDTO initiateBooking(BookingRequestDTO bookingRequest) {
@@ -39,8 +50,7 @@ public class BookingServiceImpl implements BookingService {
         Resource resource = resourceRepository.findById(bookingRequest.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
-        User user = userRepository.findById(bookingRequest.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));         
+        User user = getCurrentUser();        
 
         boolean available = availabilityService
                 .isAvailable(resource, bookingRequest.getJourneyDate());
@@ -102,5 +112,14 @@ public class BookingServiceImpl implements BookingService {
         return new BookingResponseDTO(booking.getBookingId(), booking.getResource().getTransport().getTransportCode(), booking.getResource().getSection(), booking.getResource().getResourceNumber(), booking.getJourneyDate(), booking.getStatus());
     }
 
+    public boolean isBookingOwner(Long bookingId) {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        return booking.getUser().getEmail().equals(currentUserEmail);
+
+
     
+}
 }

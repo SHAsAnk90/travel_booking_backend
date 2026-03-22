@@ -5,6 +5,7 @@ import com.travelbooking.dto.response.BookingResponseDTO;
 import com.travelbooking.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,13 +24,13 @@ public class BookingController {
         BookingResponseDTO response = bookingService.initiateBooking(bookingRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{bookingId}/confirm")
     public ResponseEntity<BookingResponseDTO> confirmBooking(@PathVariable Long bookingId) {
         BookingResponseDTO response = bookingService.confirmBooking(bookingId);
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or @bookingService.isBookingOwner(#bookingId)")
     @PutMapping("/{bookingId}/cancel")
     public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable Long bookingId) {
         BookingResponseDTO response = bookingService.cancelBooking(bookingId);

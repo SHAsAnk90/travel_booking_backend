@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
@@ -35,24 +36,24 @@ public class TransportController {
         this.transportService = transportService;
         this.searchService = searchService;
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TransportResponseDTO> createTransport(@RequestBody TransportRequestDTO transportRequest) {
         TransportResponseDTO response = transportService.createTransport(transportRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<TransportResponseDTO>> getAllTransport() {
         return ResponseEntity.ok(transportService.getAllTransport());
     }
-
+         @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
         @GetMapping("/search")
         public ResponseEntity<List<TransportResponseDTO>> searchTransport(@RequestParam String source, @RequestParam String destination) {
             List<TransportResponseDTO> response = searchService.searchTransport(source, destination);
             return ResponseEntity.ok(response);
         }
-    
+        @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
         @GetMapping("/{transportCode}/resources")
         public ResponseEntity<TransportResourceResponseDTO> getTransportResources(@PathVariable String transportCode,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime journeyDate)

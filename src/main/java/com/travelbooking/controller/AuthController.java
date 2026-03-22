@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.travelbooking.dto.request.RegisterRequestDTO;
 import com.travelbooking.dto.response.UserResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +23,12 @@ public class AuthController {
 
     @Autowired
     private AuthService userService;
-
     @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody RegisterRequestDTO userRequest) {
          userService.register(userRequest);
         return ResponseEntity.ok("User registered successfully");
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{email}")
     public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
         UserResponseDTO response = userService.getUserById(email);
